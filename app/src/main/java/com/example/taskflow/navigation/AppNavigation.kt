@@ -5,11 +5,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.taskkflow.screen.SplashScreen
-import com.example.taskkflow.screen.TaskDetailScreen
-import com.example.taskkflow.screen.TaskFormScreen
-import com.example.taskkflow.screen.TaskListScreen
-import com.example.taskkflow.viewmodel.TaskViewModel
+import com.example.taskflow.screen.SplashScreen
+import com.example.taskflow.screen.TaskDetailScreen
+import com.example.taskflow.screen.TaskFormScreen
+import com.example.taskflow.screen.TaskListScreen
+import com.example.taskflow.viewmodel.TaskViewModel
 
 @Composable
 fun AppNavigation() {
