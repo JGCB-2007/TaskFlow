@@ -7,7 +7,7 @@ import com.example.taskflow.repository.TaskRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-
+import com.example.taskflow.model.Priority
 class TaskViewModel : ViewModel() {
 
     private val repository = TaskRepository()
@@ -15,7 +15,27 @@ class TaskViewModel : ViewModel() {
     val tasks: StateFlow<List<Task>> = repository.tasks
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun addTask(task: Task) = repository.addTask(task)
-    fun updateTask(task: Task) = repository.updateTask(task)
-    fun deleteTask(task: Task) = repository.deleteTask(task)
+    fun addTask(
+        title: String,
+        description: String,
+        priority: Priority
+    ) {
+        val newTask = Task(
+            id = System.currentTimeMillis().toInt(),
+            title = title,
+            description = description,
+            priority = priority,
+            completed = false
+        )
+
+        repository.addTask(newTask)
+    }
+
+    fun updateTask(task: Task) {
+        repository.updateTask(task)
+    }
+
+    fun deleteTask(task: Task) {
+        repository.deleteTask(task)
+    }
 }

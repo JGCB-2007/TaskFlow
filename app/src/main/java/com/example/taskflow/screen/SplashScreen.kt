@@ -12,6 +12,7 @@ import com.example.taskflow.navigation.Routes
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.MaterialTheme
+import com.example.taskflow.R
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -28,12 +29,11 @@ fun SplashScreen(navController: NavController) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(id = android.R.drawable.ic_dialog_info),
-                contentDescription = "Logo",
-                modifier = Modifier.size(100.dp)
-            )
+                    painter = painterResource(id = R.drawable.taskflow_logo),
+                    contentDescription = "Logo TaskFlow",
+                    modifier = Modifier.size(180.dp)
+                )
             Spacer(modifier = Modifier.height(16.dp))
-            Text("TaskFlow", style = MaterialTheme.typography.headlineMedium)
         }
     }
 }

@@ -1,18 +1,32 @@
 package com.example.taskflow.screen
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.taskflow.model.Task
+import com.example.taskflow.model.Priority
 import com.example.taskflow.viewmodel.TaskViewModel
-import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskFormScreen(
     navController: NavController,
@@ -20,20 +34,22 @@ fun TaskFormScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
+    var selectedPriority by remember { mutableStateOf(Priority.MEDIA) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Nueva tarea") }
+            )
+        }
+    ) { paddingValues ->
+
         Column(
             modifier = Modifier
-                .fillMaxWidth(0.85f)
+                .fillMaxSize()
+                .padding(paddingValues)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Agregar Tarea", style = MaterialTheme.typography.headlineSmall)
 
             OutlinedTextField(
                 value = title,
@@ -41,6 +57,9 @@ fun TaskFormScreen(
                 label = { Text("Título") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -48,21 +67,45 @@ fun TaskFormScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Button(onClick = {
-                if (title.isNotBlank() && description.isNotBlank()) {
-                    scope.launch {
-                        viewModel.addTask(
-                            Task(
-                                id = System.currentTimeMillis().toInt(),
-                                title = title,
-                                description = description
-                            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Prioridad")
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Priority.entries.forEach { priority ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        RadioButton(
+                            selected = selectedPriority == priority,
+                            onClick = { selectedPriority = priority }
                         )
-                        navController.popBackStack()
+
+                        Text(text = priority.name)
                     }
                 }
-            }) {
-                Text("Agregar")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    if (title.isNotBlank() && description.isNotBlank()) {
+                        viewModel.addTask(
+                            title = title,
+                            description = description,
+                            priority = selectedPriority
+                        )
+
+                        navController.popBackStack()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Guardar tarea")
             }
         }
     }

@@ -14,8 +14,10 @@ class TaskRepository {
         _tasks.value = _tasks.value + task
     }
 
-    fun updateTask(task: Task) {
-        _tasks.value = _tasks.value.map { if (it.id == task.id) task else it }
+    fun updateTask(updatedTask: Task) {
+        _tasks.value = _tasks.value.map { task ->
+            if (task.id == updatedTask.id) updatedTask else task
+        }
     }
 
     fun deleteTask(task: Task) {

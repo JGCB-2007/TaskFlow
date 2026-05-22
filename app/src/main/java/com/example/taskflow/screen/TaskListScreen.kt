@@ -1,66 +1,64 @@
 package com.example.taskflow.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.taskflow.ui.components.TaskCard
+import com.example.taskflow.ui.components.FloatingButton
 import com.example.taskflow.viewmodel.TaskViewModel
+import com.example.taskflow.navigation.Routes
+import com.example.taskflow.model.Priority
 
 @Composable
-fun TaskDetailScreen(
+fun TaskListScreen(
     navController: NavController,
-    taskId: Int,
     viewModel: TaskViewModel
 ) {
-    val tasks by viewModel.tasks.collectAsState()
-    val task = tasks.find { it.id == taskId }
+    val tasks = viewModel.tasks.collectAsState().value
 
-    if (task == null) {
-        Text("Tarea no encontrada")
-        return
+    val sortedTasks = tasks.sortedBy { task ->
+        when (task.priority) {
+            Priority.ALTA -> 1
+            Priority.MEDIA -> 2
+            Priority.BAJA -> 3
+        }
     }
-
-    var title by remember(task.id) { mutableStateOf(task.title) }
-    var description by remember(task.id) { mutableStateOf(task.description) }
-    var completed by remember(task.id) { mutableStateOf(task.completed) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text("Editar tarea", style = MaterialTheme.typography.headlineSmall)
-
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Título") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Descripción") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Text("Completada")
-        Checkbox(checked = completed, onCheckedChange = { completed = it })
-
-        Button(onClick = {
-            viewModel.updateTask(
-                task.copy(
-                    title = title,
-                    description = description,
-                    completed = completed
+    Scaffold(
+        floatingActionButton = {
+            FloatingButton(onClick = { navController.navigate(Routes.TaskForm) })
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(sortedTasks) { task ->
+                TaskCard(
+                    task = task,
+                    onClick = {
+                        navController.navigate(
+                            Routes.TaskDetail.replace("{taskId}", task.id.toString())
+                        )
+                    },
+                    onDelete = {
+                        viewModel.deleteTask(task)
+                    },
+                    onCompletedChange = { isCompleted ->
+                        viewModel.updateTask(
+                            task.copy(completed = isCompleted)
+                        )
+                    }
                 )
-            )
-            navController.popBackStack()
-        }) {
-            Text("Guardar cambios")
+            }
         }
     }
 }
